@@ -21,7 +21,7 @@ npm install -g aws-cdk
 * Create the application 
 
 ```bash
-PREFIX=upcciberado
+export PREFIX=<your prefix>
 mkdir $PREFIX && cd $PREFIX
 
 # We will init everything manually this time
@@ -54,7 +54,7 @@ class SimpleDemoStack extends cdk.Stack {
 }
 
 const app = new cdk.App();
-new SimpleDemoStack(app, 'SimpleDemoStack');
+new SimpleDemoStack(app, '${PREFIX}SimpleDemoStack');
 EOF
 ```
 
