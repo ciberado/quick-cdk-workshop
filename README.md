@@ -99,6 +99,36 @@ cdk diff
 cdk deploy
 ```
 
+* Include a security group, if you are inclined to do so:
+
+```bash
+cat << EOF > index.js
+const cdk = require('@aws-cdk/core');
+const ec2 = require('@aws-cdk/aws-ec2');
+
+
+class SimpleDemoStack extends cdk.Stack {
+  constructor(app, id) {
+    super(app, id);
+    const vpc = new ec2.Vpc(this, 'VPC');
+    
+    const webSecurityGroup = new ec2.SecurityGroup(this, 'webSecurityGroup', {
+      description: 'Allow access to webservers',
+      groupName: 'sgweb',
+      vpc: vpc
+    });
+    webSecurityGroup.addIngressRule(new ec2.AnyIPv4(), new ec2.TcpPort(80), 'allow http access from any ip');
+    webSecurityGroup.addIngressRule(new ec2.AnyIPv4(), new ec2.TcpPort(443), 'allow https access from any ip');
+  }
+}
+
+const app = new cdk.App();
+new SimpleDemoStack(app, '${PREFIX}SimpleDemoStack');
+EOF
+```
+
+
+
 * Clean the house
 
 ```bash
