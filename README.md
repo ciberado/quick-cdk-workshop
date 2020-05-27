@@ -77,7 +77,7 @@ cat cdk.out/*.json
 * Set the deployment region
 
 ```
-export CDK_DEFAULT_REGION=eu-west-1
+export AWS_DEFAULT_REGION=eu-west-1
 ```
 
 * Init the CDK infrastructure
