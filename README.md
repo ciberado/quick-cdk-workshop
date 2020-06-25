@@ -147,13 +147,13 @@ npm install --save \
   @aws-cdk/aws-ec2 \
   @aws-cdk/aws-rds \
   @aws-cdk/aws-autoscaling \
-  @@aws-cdk/aws-elasticloadbalancing
+  @aws-cdk/aws-elasticloadbalancing
 ```
 
 * Write the program:
 
 ```javascript
-cat << EOF > index.js
+cat << 'EOF' > index.js
 const cdk = require('@aws-cdk/core');
 const ec2 = require('@aws-cdk/aws-ec2');
 const RDS = require('@aws-cdk/aws-rds');
@@ -211,9 +211,11 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
 }
 
 const app = new cdk.App();
-new StandardDemoStack(app, '${PREFIX}StandardDemoStack');
+new StandardDemoStack(app, 'PREFIXStandardDemoStack');
 
 EOF
+
+sed -i "s/\$PREFIX/$PREFIX/g" index.js
 ```
 * Deploy it:
 
