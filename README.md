@@ -211,7 +211,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
 }
 
 const app = new cdk.App();
-new StandardDemoStack(app, 'PREFIXStandardDemoStack');
+new StandardDemoStack(app, '$PREFIXStandardDemoStack');
 
 EOF
 
