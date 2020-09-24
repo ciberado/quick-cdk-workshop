@@ -25,7 +25,8 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       userData: userData,
       vpcSubnets: privateSubnets,
       maxCapacity: 4,
-      minCapacity: 1
+      minCapacity: 1,
+      desiredCapacity: 2
     });
     asg.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 50,
