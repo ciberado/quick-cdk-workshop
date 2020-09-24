@@ -139,7 +139,7 @@ cdk destroy
 
 ```bash
 git clone https://github.com/ciberado/quick-cdk-workshop
-cd quick-cdk-workshop/src
+cd quick-cdk-workshop/demoasg
 npm install
 ```
 
@@ -147,7 +147,7 @@ npm install
 
 ```bash
 PREFIX=<put_your_own_prefix_here>
-sed -i "s/PokemonStack/$PREFIXPokemonStack/g" index.js
+sed -i "s/PokemonStack/${PREFIX}PokemonStack/g" index.js
 ```
 * Deploy it:
 
@@ -164,5 +164,44 @@ cdk deploy
 cdk destroy
 ```
 
-For more information, visit the complete [CDK workshop](https://cdkworkshop.com).
+## Fargate service with ALB
+
+* Get the project source code:
+
+```bash
+git clone https://github.com/ciberado/quick-cdk-workshop
+cd quick-cdk-workshop/demofargate
+npm install
+```
+
+* Replace the name of the stack:
+
+```bash
+PREFIX=<put_your_own_prefix_here>
+sed -i "s/FargatePokemonStack/${PREFIX}FargatePokemonStack/g" index.ts
+```
+
+* Compile typescript to js:
+
+```bash
+npm run build
+```
+
+* Deploy it:
+
+```bash
+export AWS_DEFAULT_REGION=eu-west-1
+cdk bootstrap
+cdk diff
+cdk deploy
+```
+
+* Clean up everything
+
+```bash
+cdk destroy
+```
+
+
+For more information, visit the complete [CDK workshop](https://cdkworkshop.com) and the [official examples](https://github.com/aws-samples/aws-cdk-examples).
 
