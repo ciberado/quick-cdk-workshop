@@ -135,87 +135,19 @@ cdk destroy
 
 ## RDS + ASG + ELB (classic) example
 
-* Repeat the project creation process:
+* Get the project source code:
 
 ```bash
-cd
-export PREFIX=<your prefix>
-mkdir $PREFIX && cd $PREFIX
-npm init
-npm install --save \
-  @aws-cdk/core \
-  @aws-cdk/aws-ec2 \
-  @aws-cdk/aws-rds \
-  @aws-cdk/aws-autoscaling \
-  @aws-cdk/aws-elasticloadbalancing
+git clone https://github.com/ciberado/quick-cdk-workshop
+cd quick-cdk-workshop/src
+npm install
 ```
 
-* Write the program:
+* Replace the name of the stack:
 
-```javascript
-cat << 'EOF' > index.js
-const cdk = require('@aws-cdk/core');
-const ec2 = require('@aws-cdk/aws-ec2');
-const RDS = require('@aws-cdk/aws-rds');
-const autoscaling = require('@aws-cdk/aws-autoscaling');
-const elb = require('@aws-cdk/aws-elasticloadbalancing');
-
-class StandardDemoStack extends cdk.Stack {
-  constructor(app, id) {
-    super(app, id);
-    const vpc = new ec2.Vpc(this, 'VPC');
-
-    const privateSubnets = vpc.selectSubnets({subnetType: ec2.SubnetType.Private}).subnets;
-
-    const userData = ec2.UserData.custom(`
-#!/bin/sh
-
-wget https://github.com/ciberado/pokemon/releases/download/stress/pokemon-0.0.4-SNAPSHOT.jar
-java -jar pokemon-0.0.4-SNAPSHOT.jar
-    `);
-
-    const asg = new autoscaling.AutoScalingGroup(this, 'pokemonASG', {
-      vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
-      machineImage: new ec2.AmazonLinuxImage(),
-      userData: userData,
-      vpcSubnets: privateSubnets
-    });
-
-    const mySql = new RDS.DatabaseInstance(this, "pokemonDBMain", {
-        engine : RDS.DatabaseInstanceEngine.MYSQL,
-        backupRetention : cdk.Duration.days(1),
-        deletionProtection : false,
-        masterUsername : "admin",
-        masterUserPassword : cdk.SecretValue.plainText('supersecret'),
-        multiAz : false,
-        instanceClass : ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
-        vpc : vpc,
-        instanceIdentifier : "pokemonDBMainInstance"
-    });
-    mySql.connections.allowDefaultPortFrom(asg);
-
-   const lb = new elb.LoadBalancer(this, 'pokemonLoadBalancer', {
-      vpc,
-      internetFacing: true,
-      healthCheck: {
-        port: 8080
-      },
-    });
-
-    lb.addTarget(asg);
-
-    const listener = lb.addListener({ externalPort: 80, internalPort : 8080 });
-    listener.connections.allowDefaultPortFromAnyIpv4('Open to the world');
-  }
-}
-
-const app = new cdk.App();
-new StandardDemoStack(app, '$PREFIXStandardDemoStack');
-
-EOF
-
-sed -i "s/\$PREFIX/$PREFIX/g" index.js
+```bash
+PREFIX=<put_your_own_prefix_here>
+sed -i "s/PokemonStack/$PREFIXPokemonStack/g" index.js
 ```
 * Deploy it:
 
