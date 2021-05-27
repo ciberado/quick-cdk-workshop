@@ -158,6 +158,17 @@ cdk diff
 cdk deploy
 ```
 
+* Check for the outputs:
+
+```bash
+STACK_NAME=$(cdk ls)
+aws cloudformation describe-stacks \
+  --stack-name $STACK_NAME \
+  --region eu-west-1 \
+  --query Stacks[0].Outputs \
+  --output table
+```
+
 * Clean up everything
 
 ```bash
