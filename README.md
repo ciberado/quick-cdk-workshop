@@ -74,6 +74,14 @@ cdk synth
 cat cdk.out/*.json
 ```
 
+* Check the security of the template with a linter
+
+```bash
+sudo apt-get install ruby-full
+sudo gem install cfn-nag
+cfn_nag_scan --input-path cdk.out/*.template.json 
+```
+
 * Set the deployment region
 
 ```
