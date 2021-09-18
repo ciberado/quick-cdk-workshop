@@ -1,0 +1,121 @@
+def awsCredentials = [[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-deploy-credentials']]
+
+pipeline {
+    agent any
+
+    environment {
+      AWS_DEFAULT_REGION = 'eu-west-1'
+      APP_NAME='simplestweb'
+      BUCKET_NAME='...'
+    }
+    
+    options {
+      disableConcurrentBuilds()
+      parallelsAlwaysFailFast()
+      timestamps()
+      withCredentials(awsCredentials)
+    }    
+
+    stages {
+        
+        stage('start-deployment') {
+            steps {
+                script {
+                   scriptCreateDeployment = """#!/bin/bash
+                        DEPLOYMENT_ID=\$(aws deploy create-deployment \
+                            --application-name $APP_NAME \
+                            --deployment-config-name CodeDeployDefault.AllAtOnce \
+                            --ignore-application-stop-failures \
+                            --deployment-group-name dev \
+                            --file-exists-behavior OVERWRITE \
+                            --description "The simplest web app ever seen." \
+                            --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=simplest-web-app-v1.zip \
+                            --query deploymentId \
+                            --output text)
+                        
+                        echo \$DEPLOYMENT_ID
+                   """.trim()
+                   env.deploymentId =  sh (script: scriptCreateDeployment, returnStdout: true).trim()
+                   println "Deployment id: ${env.deploymentId}"
+                }
+                
+                script {
+                  timeout(time: 10, unit: 'MINUTES') {
+                      finalStage = input message: 'What should I do next?', ok: 'Continue',
+                            parameters: [choice(name: 'Next stage:', choices: 'finish\nrollback\nlol', description: 'Finish will delete old version, rollback will activate the old version, abort will stop the pipeline.')]
+                  }
+                }
+            }
+        }
+    
+        stage('finish') {
+            when {
+                expression { finalStage == 'finish' }
+            }            
+            steps {
+                script {
+                   scriptFinish= """#!/bin/bash
+
+                    DEPLOYMENT_ID="${env.deploymentId}"
+                    aws deploy stop-deployment --deployment-id "\$DEPLOYMENT_ID"
+
+                   """.trim()
+                   sh (script: scriptFinish, returnStdout: true).trim()
+                }
+            }
+        }        
+        stage('rollback') {
+            when {
+                expression { finalStage == 'rollback' }
+            }            
+            steps {
+                script {
+                   scriptRollback = """#!/bin/bash
+
+                    DEPLOYMENT_ID="${env.deploymentId}"
+                    
+                    GREEN_ASG_ID="None"
+                    while [[ "\$GREEN_ASG_ID" == "None" ]]
+                    do
+                        GREEN_ASG_ID=\$(aws deploy get-deployment \
+                        --deployment-id \$DEPLOYMENT_ID \
+                        --query deploymentInfo.targetInstances.autoScalingGroups[0] \
+                        --output text)
+                    done
+                    echo "Green ASG id: \$GREEN_ASG_ID"
+                    
+                    unset ROLLBACK_STATUS
+                    while [[ "\$ROLLBACK_STATUS" != "Succeeded" ]]
+                    do
+                        ROLLBACK_STATUS=\$(aws deploy stop-deployment --deployment-id "\$DEPLOYMENT_ID" --query "status" --output text)
+                        echo "Executing rollback (\$ROLLBACK_STATUS)."
+                        sleep 3
+                    done
+                    
+                    echo "Removing instances from the green ASG."
+                    aws autoscaling set-desired-capacity --auto-scaling-group-name \$GREEN_ASG_ID --desired-capacity 0
+                    
+                    unset GREEN_ASG_INSTANCES
+                    while [[ "\$GREEN_ASG_INSTANCES" != "0" ]]
+                    do
+                        GREEN_ASG_INSTANCES=\$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name \$GREEN_ASG_ID  --query AutoScalingGroups[0].Instances --output text | wc -l)
+                        echo "Instances in the green ASG: \$GREEN_ASG_INSTANCES"
+                        sleep 5
+                    done
+                    
+                    echo "Deleting green ASG (\$GREEN_ASG_ID)."
+                    aws autoscaling delete-auto-scaling-group --auto-scaling-group-name \$GREEN_ASG_ID
+
+                   """.trim()
+                   sh (script: scriptRollback, returnStdout: true).trim()
+               }
+            }
+        }        
+    }
+    
+  post {
+    always {
+      cleanWs()
+    }
+  }
+}

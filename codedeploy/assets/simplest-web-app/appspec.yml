@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /index.nginx-debian.html
+    destination: /var/www/html/
+    file_exists_behavior: OVERWRITE
+hooks:
+  BeforeInstall:
+    - location: ./beforeinstall.sh
+      timeout: 10
