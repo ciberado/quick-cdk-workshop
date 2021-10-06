@@ -17,8 +17,8 @@ echo Deployment id: $DEPLOYMENT_ID
 DEPLOYMENT_STATUS=$(aws deploy get-deployment --deployment-id $DEPLOYMENT_ID --query deploymentInfo.status --output text)
 echo Deployment status: $DEPLOYMENT_STATUS
 
-unset GREEN_ASG_ID
-while [[ "$GREEN_ASG_ID" == "" ]]
+GREEN_ASG_ID="None"
+while [[ "$GREEN_ASG_ID" == "None" ]]
 do
     GREEN_ASG_ID=$(aws deploy get-deployment \
     --deployment-id $DEPLOYMENT_ID \

@@ -1,3 +1,4 @@
 {
-  "app": "node index"
+  "app": "node index",
+  "@aws-cdk/core:newStyleStackSynthesis": true
 }

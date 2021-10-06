@@ -36,7 +36,8 @@ service codedeploy-agent status
 
         `);
     const ami = ec2.MachineImage.genericLinux({
-      'eu-west-1': 'ami-0088366b4b407a312'
+      'eu-west-1': 'ami-020fc399c31009b50',
+      'eu-central-1': 'ami-0215371f3ea49a91b'
     });
     const asg = new autoscaling.AutoScalingGroup(this, 'SimplestWebASG', {
       vpc,
@@ -53,7 +54,6 @@ service codedeploy-agent status
     asg.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
     );
-
 
     const lb = new elb.LoadBalancer(this, 'SimplestWebLoadBalancer', {
       vpc,
