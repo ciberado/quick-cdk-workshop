@@ -1,21 +1,17 @@
 import cdk = require('@aws-cdk/core');
 import iam = require('@aws-cdk/aws-iam');
-import s3 = require('@aws-cdk/aws-s3');
-import s3deploy = require('@aws-cdk/aws-s3-deployment');
 import ec2 = require('@aws-cdk/aws-ec2');
 import autoscaling = require('@aws-cdk/aws-autoscaling');
 import elbv2 = require('@aws-cdk/aws-elasticloadbalancingv2');
 
+import codepipeline = require('@aws-cdk/aws-codepipeline');
+import actions = require('@aws-cdk/aws-codepipeline-actions');
+import cloudtrail = require ('@aws-cdk/aws-cloudtrail');
+import s3 = require('@aws-cdk/aws-s3');
+
 class SimplestWebStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-
-    const appBucket = new s3.Bucket(this, 'assets');
-    
-    new s3deploy.BucketDeployment(this, 'DeployFiles', {
-      sources: [s3deploy.Source.asset('./assets')], 
-      destinationBucket: appBucket,
-    });    
 
     const vpc = new ec2.Vpc(this, 'VPC');
 
@@ -23,16 +19,18 @@ class SimplestWebStack extends cdk.Stack {
 
     const userData = ec2.UserData.custom(`#!/bin/sh
 
+# nginx server
 sudo apt update
 apt-get install -y nginx
 service nginx start
 
-# apt install -y ruby-full wget
-# cd /home/ubuntu
-# wget https://aws-codedeploy-eu-west-1.s3.eu-west-1.amazonaws.com/latest/install
-# chmod +x ./install
-# ./install auto > /tmp/logfile
-# service codedeploy-agent status
+# cloud deploy agent
+apt install -y ruby-full wget
+cd /home/ubuntu
+wget https://aws-codedeploy-eu-west-1.s3.eu-west-1.amazonaws.com/latest/install
+chmod +x ./install
+./install auto > /tmp/logfile
+service codedeploy-agent status
 
         `);
     const ami = ec2.MachineImage.genericLinux({
@@ -76,15 +74,60 @@ service nginx start
       value: lb.loadBalancerDnsName
     });
 
-    new cdk.CfnOutput(this, 'AppBucket', {
-      value: appBucket.bucketName
-    });
+
   }
 }
 
+class SimplestWebPipelineStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props)
+    const sourceBucket = new s3.Bucket(this, 'SourceBucket', {
+      versioned : true
+    });
+    const pipeline = new codepipeline.Pipeline(this, 'SimplestWebPipeline');
+    const sourceArtifact = new codepipeline.Artifact('SimplestWebArtifact');
+
+    const appFilePath = 'simplest-web-app.zip';
+    const trail = new cloudtrail.Trail(this, 'CloudTrail');
+    trail.addS3EventSelector([{
+      bucket: sourceBucket,
+      objectPrefix: appFilePath,
+    }], {
+      readWriteType: cloudtrail.ReadWriteType.WRITE_ONLY,
+    });    
+    const s3SourceAction = new actions.S3SourceAction({
+        actionName: 'SourceFromS3',
+        bucket: sourceBucket,
+        bucketKey: appFilePath,
+        output: sourceArtifact,
+        trigger: actions.S3Trigger.EVENTS, // Use .POLL as an alternative to avoid cloudtrail
+    });
+    pipeline.addStage({
+        stageName: 'Source',
+        actions: [ s3SourceAction ]
+    });
+
+    const dummyAction = new actions.S3DeployAction({
+      actionName: 'Dummy',
+      bucket: sourceBucket,
+      input: sourceArtifact,
+      objectKey: 'dummy.zip'
+    });
+    pipeline.addStage({
+        stageName: 'Dummy',
+        actions: [ dummyAction ]
+    });
+
+    new cdk.CfnOutput(this, 'SourceBucketName', {
+      value: sourceBucket.bucketName
+    });
+
+  }
+}
 
 const app = new cdk.App();
 
 new SimplestWebStack(app, 'SimplestWebCodeDeployStack');
+new SimplestWebPipelineStack(app, 'SimplestWebPipelineStack');
 
 app.synth();
