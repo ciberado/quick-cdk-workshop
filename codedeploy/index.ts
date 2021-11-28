@@ -127,7 +127,7 @@ class SimplestWebPipelineStack extends cdk.Stack {
 
 const app = new cdk.App();
 
-new SimplestWebStack(app, 'SimplestWebCodeDeployStack');
+new SimplestWebStack(app, 'SimplestWebStack-' + process.env.USER);
 // new SimplestWebPipelineStack(app, 'SimplestWebPipelineStack');
 
 app.synth();
