@@ -48,6 +48,11 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
     asg.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
     );
+    asg.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 50,
+      cooldown : cdk.Duration.seconds(120),
+      estimatedInstanceWarmup : cdk.Duration.seconds(60)
+    });
 
     const postgres = new rds.DatabaseInstance(this, 'pokemonDBMain' + process.env.USER, {
       engine : rds.DatabaseInstanceEngine.postgres({
