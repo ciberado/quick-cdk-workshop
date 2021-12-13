@@ -93,4 +93,9 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
 
 const app = new cdk.App();
 
-new PokemonStack(app, 'pokemon-' + process.env.USER);
+new PokemonStack(app, 'pokemon-' + process.env.USER, {
+  tags : {
+    'project' : 'quick-cdk-workshop',
+    'owner' : process.env.USER!
+  }
+});
