@@ -14,9 +14,8 @@ This project will deploy a classic infra composed of:
 * Install `node`
 
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-source .bashrc
-nvm install 12.16.3
+curl -L https://git.io/n-install | bash
+. $HOME/.bashrc 
 
 node --version
 npm --version
