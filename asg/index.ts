@@ -59,7 +59,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       instanceIdentifier : 'pokemonDBMainInstance',
       vpcSubnets : privateSubnets,
       credentials : {
-        username : 'admin',
+        username : 'postadmin',
         password : cdk.SecretValue.plainText('supersecret')
       }
     });
