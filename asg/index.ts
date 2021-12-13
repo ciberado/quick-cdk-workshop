@@ -74,7 +74,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       open: true,
     });   
     listener.addTargets('pokemonAppFleet' + process.env.USER, {
-      port: 80,
+      port: 8080,
       targets: [asg],
       healthCheck: {
         path: '/health',
