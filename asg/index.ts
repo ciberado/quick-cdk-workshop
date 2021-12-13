@@ -17,17 +17,9 @@ class PokemonStack extends cdk.Stack {
 `#!/bin/sh
 
 sudo apt update
-
-# cloud deploy agent
-apt install -y ruby-full wget
-cd /home/ubuntu
-wget https://aws-codedeploy-eu-west-1.s3.eu-west-1.amazonaws.com/latest/install
-chmod +x ./install
-./install auto > /tmp/logfile
-service codedeploy-agent status
+sudo apt install openjdk-8-jre-headless -y
 
 # pokemon
-sudo apt install openjdk-8-jre-headless -y
 wget https://github.com/ciberado/pokemon/releases/download/stress/pokemon-0.0.4-SNAPSHOT.jar
 java -jar pokemon-0.0.4-SNAPSHOT.jar
 
