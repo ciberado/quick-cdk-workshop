@@ -56,7 +56,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       deletionProtection : false,
       multiAz : false,
       vpc : vpc,
-      instanceIdentifier : 'pokemonDBMainInstance',
+      instanceIdentifier : 'pokemonDB' + process.env.USER,
       vpcSubnets : privateSubnets,
       credentials : {
         username : 'postadmin',
