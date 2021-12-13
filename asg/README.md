@@ -21,12 +21,6 @@ node --version
 npm --version
 ```
 
-* Install the CDK cli
-
-```bash
-npm install -g aws-cdk
-```
-
 * Compile and check the stack
 
 ```bash
