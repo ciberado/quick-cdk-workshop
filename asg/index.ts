@@ -9,7 +9,7 @@ class PokemonStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = new ec2.Vpc(this, 'VPC');
+    const vpc = new ec2.Vpc(this, 'VPC' + process.env.USER);
 
     const privateSubnets = vpc.selectSubnets({subnetType: ec2.SubnetType.PRIVATE_WITH_NAT});
 
@@ -36,7 +36,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       'eu-west-1': 'ami-020fc399c31009b50',
       'eu-central-1': 'ami-0215371f3ea49a91b'
     });
-    const asg = new autoscaling.AutoScalingGroup(this, 'pokemonASG', {
+    const asg = new autoscaling.AutoScalingGroup(this, 'pokemonASG' + process.env.USER, {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
       machineImage: ami,
@@ -49,7 +49,7 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
     );
 
-    const postgres = new rds.DatabaseInstance(this, 'pokemonDBMain', {
+    const postgres = new rds.DatabaseInstance(this, 'pokemonDBMain' + process.env.USER, {
       engine : rds.DatabaseInstanceEngine.postgres({
         version: rds.PostgresEngineVersion.VER_12_4,
       }),       
@@ -65,15 +65,15 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
     });
     postgres.connections.allowDefaultPortFrom(asg);
 
-    const lb = new elbv2.ApplicationLoadBalancer(this, 'pokemonALB', {
+    const lb = new elbv2.ApplicationLoadBalancer(this, 'pokemonALB' + process.env.USER, {
       vpc,
       internetFacing: true
     });
-    const listener = lb.addListener('Listener', {
+    const listener = lb.addListener('Listener' + process.env.USER, {
       port: 80,
       open: true,
     });   
-    listener.addTargets('pokemonAppFleet', {
+    listener.addTargets('pokemonAppFleet' + process.env.USER, {
       port: 80,
       targets: [asg],
       healthCheck: {
