@@ -49,7 +49,7 @@ class PetclinicDBStack extends cdk.Stack {
 
     this.mysql = new rds.DatabaseInstance(this, 'DB-MAIN', {
       databaseName : 'petclinic',
-      instanceIdentifier : 'pokemonDB' + process.env.USER,
+      instanceIdentifier : 'PETCLINIC-DB',
       engine : rds.DatabaseInstanceEngine.mysql({
         version: rds.MysqlEngineVersion.VER_5_7
       }),       
@@ -81,7 +81,6 @@ class PetclinicAppStack extends cdk.Stack {
 sudo apt update
 sudo apt install openjdk-8-jdk-headless -y
 
-# pokemon
 git clone https://github.com/spring-petclinic/spring-framework-petclinic.git
 cd spring-framework-petclinic
 
