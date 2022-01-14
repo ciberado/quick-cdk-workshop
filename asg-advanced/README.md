@@ -58,6 +58,8 @@ npm run bootstrap
 npm run deploy
 ```
 
+The output of the last stack will contain the http address of the load balancer.
+
 ## Check security
 
 * Install [cfn-nag](https://github.com/stelligent/cfn_nag)
