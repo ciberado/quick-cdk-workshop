@@ -1,13 +1,31 @@
-# Classic infrastructure stack
+# Advanced CDK usage
 
 ## Scenario
 
-This project will deploy a classic infra composed of:
+This is a very similar project to the last one, but shows how to achieve
+a more sophisticated design by dividing the application in different stacks,
+one for each layer (networking, database, computing).
+
+The project deploys:
 
 * A VPC with public and private parts, and the corresponding NAT-gw
+* A Mysql instance
+* Explicit security groups, with centralized configuration at network level
 * An Application Load Balancer
 * An Autoscaling Group with CPU-based elasticity
-* A Postgresql instance
+
+## Todo
+
+The database credentials are stored in plaintext instead of being obtained from
+an already-existing secret. That's practical for a demo, but not acceptable for
+production.
+
+Also, those credentials are inserted in the source code of the application (in particular,
+in `pom.xml` file) using the user-data.
+
+A future version will handle this situation in a more elegant way. Also, it would be
+advisable to directly deploy the artifact instead of requiring its compilation... but
+that would force us to stop using the [official Spring repository](https://github.com/spring-petclinic/spring-framework-petclinic).
 
 ## Running the demo
 
@@ -25,19 +43,41 @@ npm --version
 
 ```bash
 npm run build
-npm run cdk synth
+npm run synth
 ```
 
 * Init the cdk assets
 
 ```bash
-npm run cdk bootstrap
+npm run bootstrap
 ```
 
 * Deploy the stack
 
 ```bash
-npm run cdk deploy
+npm run deploy
+```
+
+## Check security
+
+* Install [cfn-nag](https://github.com/stelligent/cfn_nag)
+
+```
+sudo apt update
+sudo apt install ruby -y
+sudo gem install cfn-nag
+```
+
+* Ensure the synths are generated
+
+```
+npm run synth
+```
+
+* Run the checks
+
+```
+cfn_nag_scan -g --input-path cdk.out/
 ```
 
 ## Clean up
