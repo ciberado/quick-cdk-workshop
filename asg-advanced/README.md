@@ -87,5 +87,5 @@ cfn_nag_scan -g --input-path cdk.out/
 * Just delete de stack
 
 ```bash
-npx cdk destroy -all
+npx cdk destroy --all
 ```
