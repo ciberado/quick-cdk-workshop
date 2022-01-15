@@ -87,7 +87,7 @@ cd spring-framework-petclinic
 RDS=${mysql.dbInstanceEndpointAddress}
 echo "RDS endpoint: $RDS."
 
-sed -i "s/localhost:3306/$RDS:3306/g; s/username>petclinic<\/jdbc/username>admin<\/jdbc/g; s/password>petclinic<\/jdbc/password>p3tcl1n1c<\/jdbc/g" pom.xml
+sed -i "s~localhost:3306~$RDS:3306~g; s~username>petclinic</jdbc~username>admin</jdbc~g; s~password>petclinic</jdbc~password>p3tcl1n1c</jdbc~g" pom.xml
 
 ./mvnw jetty:run-war -P MySQL -DskipTests
 
@@ -99,9 +99,10 @@ sed -i "s/localhost:3306/$RDS:3306/g; s/username>petclinic<\/jdbc/username>admin
     const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
       vpc,
       securityGroup : asgSecurityGroup,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
       machineImage: ami,
       userData: userData,
+      updatePolicy : autoscaling.UpdatePolicy.rollingUpdate(),
       vpcSubnets: privateSubnets,
       maxCapacity: 4,
       minCapacity: 1,
