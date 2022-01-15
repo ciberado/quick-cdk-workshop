@@ -43,19 +43,19 @@ npm --version
 
 ```bash
 npm run build
-npm run synth
+npx cdk synth
 ```
 
 * Init the cdk assets
 
 ```bash
-npm run bootstrap
+npx cdk bootstrap
 ```
 
 * Deploy the stack
 
 ```bash
-npm run deploy
+npx cdk deploy --all --require-approval never
 ```
 
 The output of the last stack will contain the http address of the load balancer.
@@ -87,5 +87,5 @@ cfn_nag_scan -g --input-path cdk.out/
 * Just delete de stack
 
 ```bash
-npm run cdk destroy
+npx cdk destroy -all
 ```
