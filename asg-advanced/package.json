@@ -8,7 +8,7 @@
     "watch": "tsc -w",
     "synth": "cdk synth",
     "bootstrap": "cdk bootstrap",
-    "deploy": "cdk deploy --all",
+    "deploy": "cdk deploy --all --require-approval never",
     "destroy": "cdk destroy --all"
   },
   "author": {
