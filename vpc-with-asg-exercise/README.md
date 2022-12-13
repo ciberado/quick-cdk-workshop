@@ -6,7 +6,7 @@ This project will deploy a classic infra composed of:
 
 * A VPC with public and private parts, and the corresponding NAT-gw
 * An Application Load Balancer
-* An Autoscaling Group with CPU-based elasticity
+* An Autoscaling Group with CPU-based or requests per minute elasticity
 * A Postgresql instance
 
 ## Running the demo
