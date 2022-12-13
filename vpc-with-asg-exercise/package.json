@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy" : "npm run build; npm run cdk deploy"
   },
   "author": {
     "name": "Amazon Web Services",
