@@ -1,0 +1,30 @@
+{
+  "name": "code-deploy-demo-based-on-s3-zip-file",
+  "version": "1.0.0",
+  "description": "Deploying an application with codedeploy",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com",
+    "organization": true
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^10.17.0",
+    "aws-cdk": "^1.126.0",
+    "typescript": "^3.8"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-autoscaling": "*",
+    "@aws-cdk/aws-ec2": "*",
+    "@aws-cdk/aws-elasticloadbalancingv2": "*",
+    "@aws-cdk/aws-iam": "*",
+    "@aws-cdk/aws-rds": "^1.135.0",
+    "@aws-cdk/core": "*"
+  }
+}
