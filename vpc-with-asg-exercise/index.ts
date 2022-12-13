@@ -30,8 +30,7 @@ class PokemonStack extends cdk.Stack {
       }),
     });  
 
-/* -----------------------------------------------------------------------------------------
-
+/* -------------------------------------------------------------------------------------------
     const privateSubnets = vpc.selectSubnets({subnetType: ec2.SubnetType.PRIVATE_WITH_NAT});
 
     const userData = ec2.UserData.custom(
@@ -61,15 +60,6 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
     asg.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
     );
-    asg.scaleOnCpuUtilization('CpuScaling', {
-      targetUtilizationPercent: 50,
-      cooldown : cdk.Duration.seconds(120),
-      estimatedInstanceWarmup : cdk.Duration.seconds(60)
-    });
-    asg.scaleOnRequestCount('requests-per-minute', {
-         targetRequestsPerMinute: 60,
-    });
-
     listener.addTargets('pokemonAppFleet' + process.env.USER, {
       port: 8080,
       targets: [asg],
@@ -79,8 +69,18 @@ java -jar pokemon-0.0.4-SNAPSHOT.jar
       }
     });
 
+    asg.scaleOnRequestCount('requests-per-minute', {
+         targetRequestsPerMinute: 60,
+    });
 
------------------------------------------------------------------------------------------ */
+    asg.scaleOnCpuUtilization('CpuScaling', {
+      targetUtilizationPercent: 50,
+      cooldown : cdk.Duration.seconds(120),
+      estimatedInstanceWarmup : cdk.Duration.seconds(60)
+    });
+
+
+   --------------------------------------------------------------------------------------*/
 
 /* ----------------------------------------------------------------------------------------
 
